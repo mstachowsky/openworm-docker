@@ -53,20 +53,22 @@ RUN apt-get install -y --no-install-recommends xubuntu-desktop
 
 
 
-COPY ./NVIDIA-Linux-x86_64-375.82.run /home/ow/NVIDIA-Linux-x86_64-375.82.run
+COPY ./NVIDIA-Linux-x86_64-375.82.run $HOME/NVIDIA-Linux-x86_64-375.82.run
 RUN service lightdm stop && \
   cd /home/ow && \
   chmod +x NVIDIA-Linux-x86_64-375.82.run && \
   ./NVIDIA-Linux-x86_64-375.82.run -s -N --no-kernel-module 
 
 
-COPY ./intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz /home/ow/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
+COPY ./intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
 RUN cd /home/ow && \
   tar xvf intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
 COPY ./silent-intel-sdk.cfg /home/ow/intel_sdk_for_opencl_2017_7.0.0.2511_x64/silent-intel-sdk.cfg
 RUN cd /home/ow/intel_sdk_for_opencl_2017_7.0.0.2511_x64 && \
   ./install.sh --silent silent-intel-sdk.cfg
 
+RUN rm $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz && \
+  rm $HOME/NVIDIA-Linux-x86_64-375.82.run
 
 RUN service lightdm start
 
@@ -137,4 +139,8 @@ ENV PATH=$PATH:$IV/$CPU/bin:$N/$CPU/bin
 ENV NEURON_HOME=$N/$CPU
 ENV PYTHONPATH=$PYTHONPATH:$HOME/sibernetic
 ENV C302_HOME=$HOME/CElegansNeuroML/CElegans/pythonScripts/c302
+ENV SIBERNETIC_HOME=$HOME/sibernetic
+
+
+COPY ./master_openworm.py $HOME/master_openworm.py
 
