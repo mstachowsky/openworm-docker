@@ -10,4 +10,4 @@ docker run -ti \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   -v $HOME/shared:/home/ow/shared \
   openworm:0.1 \
-  /bin/bash
+  python master_openworm.py

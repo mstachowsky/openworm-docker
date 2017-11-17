@@ -7,6 +7,14 @@ import sys
 sys.path.append(os.environ['C302_HOME']) 
 
 
+try:
+    os.system('sudo chown %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    raise
+
+
+
 
 DEFAULTS = {'duration': 10.0,
             'dt': 0.005,
