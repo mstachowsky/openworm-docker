@@ -6,6 +6,11 @@ import sys
 
 sys.path.append(os.environ['C302_HOME']) 
 
+try:
+    os.system('xhost +')
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+
 
 try:
     os.system('sudo chown %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
@@ -16,7 +21,7 @@ except:
 
 
 
-DEFAULTS = {'duration': 10.0,
+DEFAULTS = {'duration': 50.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
@@ -53,10 +58,10 @@ print("It will report out where steps are missing.")
 print("Eventually all the steps will be filled in.")
 print("")
 
-#print("****************************")
-#print("Step 1: Rebuild c302 from the latest PyOpenWorm")
-#print("****************************")
-
+print("****************************")
+print("Step 1: Rebuild c302 from the latest PyOpenWorm")
+print("****************************")
+print("not yet implemented.")
 
 
 print("****************************")
@@ -120,9 +125,10 @@ try:
                 -device %s 
                 -configuration %s 
                 -reference %s 
-                -c302params %s
-                -outDir %s""" % (DEFAULTS['duration'], DEFAULTS['dt'], DEFAULTS['dtNrn'], DEFAULTS['logstep'], DEFAULTS['device'], DEFAULTS['configuration'], DEFAULTS['reference'], DEFAULTS['c302params'], DEFAULTS['outDir'])
-    execute_with_realtime_output(command, os.path.join(os.environ['HOME'], 'sibernetic'))
+                -c302params %s 
+                -datareader %s 
+                -outDir %s""" % (DEFAULTS['duration'], DEFAULTS['dt'], DEFAULTS['dtNrn'], DEFAULTS['logstep'], DEFAULTS['device'], DEFAULTS['configuration'], DEFAULTS['reference'], DEFAULTS['c302params'], DEFAULTS['datareader'], DEFAULTS['outDir'])
+    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
 

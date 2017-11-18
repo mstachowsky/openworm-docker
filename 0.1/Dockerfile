@@ -2,13 +2,28 @@ FROM ubuntu:16.04
 
 MAINTAINER David Lung "lungdm@gmail.com"
 
+ARG USR=ow
+ENV USER=$USR
+
+
+ARG NVIDIA_VERSION=375.82
+
+
+
+ARG INTEL_SDK_SILENT_CONFIG=silent-intel-sdk.cfg
+
+#ARG NVIDIA_RUN_FILE=NVIDIA-Linux-x86_64-375.82.run
+#ARG INTEL_SDK_OPENCL_VERSION=intel_sdk_for_opencl_2017_7.0.0.2511_x64
+#ARG INTEL_SDK_OPENCL=$INTEL_SDK_OPENCL_VERSION.tgz
+
+
+
 RUN apt-get update && \
   apt-get upgrade -y && \
   apt-get dist-upgrade -y
 
 
-ARG USR=ow
-ENV USER=$USR
+
 
 
 RUN mkdir /etc/sudoers.d
@@ -29,6 +44,7 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 
 
 RUN apt-get install -y apt-utils \
+  wget \
   build-essential \
   make \
   git \
@@ -64,22 +80,25 @@ ENV HOME /home/$USER
 WORKDIR $HOME
 
 
-COPY ./NVIDIA-Linux-x86_64-375.82.run $HOME/NVIDIA-Linux-x86_64-375.82.run
+#COPY ./$NVIDIA_RUN_FILE $HOME/$NVIDIA_RUN_FILE
+RUN wget http://us.download.nvidia.com/XFree86/Linux-x86_64/$NVIDIA_VERSION/NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run
 RUN sudo service lightdm stop && \
   cd $HOME && \
-  sudo chmod +x NVIDIA-Linux-x86_64-375.82.run && \
-  sudo ./NVIDIA-Linux-x86_64-375.82.run -s -N --no-kernel-module 
+  sudo chmod +x NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run && \
+  sudo ./NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run -s -N --no-kernel-module 
 
 
-COPY ./intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
-COPY ./silent-intel-sdk.cfg $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64/silent-intel-sdk.cfg
+#COPY ./$INTEL_SDK_OPENCL $HOME/$INTEL_SDK_OPENCL
+RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
+COPY ./$INTEL_SDK_SILENT_CONFIG $HOME/$INTEL_SDK_SILENT_CONFIG
 RUN cd $HOME && \
   sudo tar xvf intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz && \
   cd $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64 && \
-  sudo ./install.sh --silent silent-intel-sdk.cfg
+  sudo ./install.sh --silent $HOME/$INTEL_SDK_SILENT_CONFIG
 
 RUN sudo rm $HOME/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz && \
-  sudo rm $HOME/NVIDIA-Linux-x86_64-375.82.run
+  sudo rm $HOME/NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run && \
+  sudo rm $HOME/$INTEL_SDK_SILENT_CONFIG
 
 RUN sudo service lightdm start
 
@@ -141,9 +160,9 @@ ENV N=$HOME/neuron/nrn
 ENV CPU=x86_64
 ENV PATH=$PATH:$IV/$CPU/bin:$N/$CPU/bin
 ENV NEURON_HOME=$N/$CPU
-ENV PYTHONPATH=$PYTHONPATH:$HOME/sibernetic
 ENV C302_HOME=$HOME/CElegansNeuroML/CElegans/pythonScripts/c302
 ENV SIBERNETIC_HOME=$HOME/sibernetic
+ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
 
 
 
