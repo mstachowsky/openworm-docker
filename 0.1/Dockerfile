@@ -45,6 +45,8 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 
 RUN apt-get install -y apt-utils \
   wget \
+  nano \
+  htop \
   build-essential \
   make \
   git \
@@ -80,7 +82,6 @@ ENV HOME /home/$USER
 WORKDIR $HOME
 
 
-#COPY ./$NVIDIA_RUN_FILE $HOME/$NVIDIA_RUN_FILE
 RUN wget http://us.download.nvidia.com/XFree86/Linux-x86_64/$NVIDIA_VERSION/NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run
 RUN sudo service lightdm stop && \
   cd $HOME && \
@@ -88,7 +89,6 @@ RUN sudo service lightdm stop && \
   sudo ./NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run -s -N --no-kernel-module 
 
 
-#COPY ./$INTEL_SDK_OPENCL $HOME/$INTEL_SDK_OPENCL
 RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_2017_7.0.0.2511_x64.tgz
 COPY ./$INTEL_SDK_SILENT_CONFIG $HOME/$INTEL_SDK_SILENT_CONFIG
 RUN cd $HOME && \
@@ -118,7 +118,7 @@ RUN mkdir neuron && \
   sudo make install && \
   cd ../nrn && \
   ./build.sh && \
-  ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python --with-paranrn && \
+  ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python && \
   make && \
   sudo make install && \
   cd src/nrnpython && \

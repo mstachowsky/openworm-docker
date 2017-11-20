@@ -13,7 +13,7 @@ except:
 
 
 try:
-    os.system('sudo chown %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
+    os.system('sudo chown -R %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
 except:
     print("Unexpected error: %s" % sys.exc_info()[0])
     raise
@@ -77,29 +77,16 @@ run_c302(DEFAULTS['reference'],
          'jNeuroML_NEURON', 
          data_reader=DEFAULTS['datareader'], 
          save=True, 
-         show_plot_already=False, 
-         save_fig_to=DEFAULTS['outDir'])
+         show_plot_already=False,
+         target_directory=os.path.join(DEFAULTS['outDir'], 'c302_out'),
+         save_fig_to='examples')
 
 
-"""try:
-    os.chdir(os.environ['C302_HOME'])
-    call(["python", "c302_Full.py"])  # To regenerate the NeuroML & LEMS files
-    call(["pynml", "examples/LEMS_c302_A_Full.xml"])   # Run a simulation with jNeuroML via [pyNeuroML](http://github.com/NeuroML/pyNeuroML)
-except:
-    print "Unexpected error:", sys.exc_info()[0]
-    raise"""
-
-"""print("****************************")
+print("****************************")
 print("Step 3: Feed muscle activations into Sibernetic")
 print("****************************")
+print("not yet implemented.")
 
-try:
-    os.chdir("/sibernetic/src")
-    call(["wget", "https://github.com/pgleeson/Smoothed-Particle-Hydrodynamics/blob/master/src/main_sim.py"])
-    call(["python", "main_sim.py"])
-except:
-    print "Unexpected error:", sys.exc_info()[0]
-    raise"""
 
 print("****************************")
 print("Step 4: Run Sibernetic")
@@ -117,7 +104,7 @@ except:
     raise"""
 
 try:
-    command = """python sibernetic_c302.py
+    command = """python sibernetic_c302.py 
                 -duration %s 
                 -dt %s 
                 -dtNrn %s 
@@ -127,7 +114,18 @@ try:
                 -reference %s 
                 -c302params %s 
                 -datareader %s 
-                -outDir %s""" % (DEFAULTS['duration'], DEFAULTS['dt'], DEFAULTS['dtNrn'], DEFAULTS['logstep'], DEFAULTS['device'], DEFAULTS['configuration'], DEFAULTS['reference'], DEFAULTS['c302params'], DEFAULTS['datareader'], DEFAULTS['outDir'])
+                -outDir %s""" % \
+                (DEFAULTS['duration'],
+                DEFAULTS['dt'],
+                DEFAULTS['dtNrn'], 
+                DEFAULTS['logstep'], 
+                DEFAULTS['device'], 
+                DEFAULTS['configuration'], 
+                DEFAULTS['reference'], 
+                DEFAULTS['c302params'], 
+                DEFAULTS['datareader'],
+                'simulations') 
+                #DEFAULTS['outDir'])
     execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
