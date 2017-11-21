@@ -1,6 +1,6 @@
+#!/bin/bash
+
 xhost +
-
-
 
 docker run -ti \
   --device /dev/nvidia0:/dev/nvidia0 \

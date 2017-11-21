@@ -19,6 +19,11 @@ except:
     raise
 
 
+try:
+    execute_with_realtime_output('make clean && make all', os.environ['SIBERNETIC_HOME'])
+except KeyboardInterrupt as e:
+    sys.exit()
+
 
 
 DEFAULTS = {'duration': 50.0, # 50 ms
