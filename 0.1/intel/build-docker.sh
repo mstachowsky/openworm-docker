@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t "openworm-nvidia:0.1" .
+docker build -t "openworm-intel:0.1" .

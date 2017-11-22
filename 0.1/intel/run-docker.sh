@@ -8,5 +8,5 @@ docker run -ti \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   --privileged \
   -v $HOME/shared:/home/ow/shared:rw \
-  openworm-nvidia:0.1 \
+  openworm-intel:0.1 \
   /bin/bash
