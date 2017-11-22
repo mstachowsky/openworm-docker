@@ -64,12 +64,14 @@ RUN apt-get install -y apt-utils \
   python-setuptools python-yaml libnuma1 \
   openmpi-bin  libopenmpi-dev
 
+RUN sudo apt-get install -y python-matplotlib
 #RUN  sudo pip install --upgrade matplotlib
 
 RUN apt-get install -y --no-install-recommends xubuntu-desktop 
 
 #RUN sudo apt-get install nvidia-opencl-dev
 
+RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
 
 USER $USER
 ENV HOME /home/$USER
@@ -115,7 +117,7 @@ RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/in
   rm intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   sudo rm /tmp/silent-intel-sdk.cfg
 
-RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
+
 
 RUN git clone https://github.com/lungd/jNeuroML.git && \
   cd jNeuroML && \
@@ -154,4 +156,4 @@ ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
 
 
-COPY ./master_openworm.py /tmp/master_openworm.py
+COPY ./master_openworm.py $HOME/master_openworm.py
