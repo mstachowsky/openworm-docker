@@ -65,6 +65,7 @@ RUN apt-get install -y apt-utils \
   libgl1-mesa-glx libgl1-mesa-dri
 RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
 
+RUN sudo apt-get install -y python-matplotlib
 #RUN  sudo pip install --upgrade matplotlib
 
 RUN apt-get install -y --no-install-recommends xubuntu-desktop 
