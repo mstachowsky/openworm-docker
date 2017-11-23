@@ -55,12 +55,8 @@ RUN apt-get install --no-install-recommends -y apt-utils \
   linux-source linux-headers-generic \
   maven openjdk-8-jdk \
   python-setuptools python-yaml libnuma1 \
-<<<<<<< HEAD
-  openmpi-bin  libopenmpi-dev xubuntu-desktop 
-=======
-  openmpi-bin  libopenmpi-dev && \
+  openmpi-bin  libopenmpi-dev xubuntu-desktop && \
   sudo pip install --upgrade matplotlib
->>>>>>> lungd/master
 
 
 #RUN sudo apt-get install nvidia-opencl-dev
