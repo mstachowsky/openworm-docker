@@ -137,7 +137,7 @@ RUN git clone https://github.com/lungd/sibernetic.git && \
   make clean && make all
 
 
-ENV JNML_HOME=$HOME/neuroml_dev/jNeuroML
+ENV JNML_HOME=$HOME/jNeuroML
 ENV PATH=$PATH:$JNML_HOME
 ENV IV=$HOME/neuron/iv
 ENV N=$HOME/neuron/nrn

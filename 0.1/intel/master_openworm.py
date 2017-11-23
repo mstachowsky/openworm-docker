@@ -1,9 +1,11 @@
 from __future__ import print_function
 from subprocess import call, Popen, PIPE
 import os
+import pwd
 import shlex
 import sys
 
+OW_OUT_DIR = os.environ['OW_OUT_DIR']
 
 def execute_with_realtime_output(command, directory, env=None):
     p = None
@@ -27,6 +29,21 @@ try:
 except:
     print("Unexpected error: %s" % sys.exc_info()[0])
 
+
+try:
+    # dirty hack to fix an issue changing the output directory of Sibernetic
+    os.system('ln -s %s %s' % (OW_OUT_DIR, os.path.join(os.environ['SIBERNETIC_HOME'], 'simulations')))
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    raise
+
+
+try:
+    if pwd.getpwuid(os.stat(OW_OUT_DIR).st_uid).pw_name != os.environ['USER']:
+        os.system('sudo chown -R %s:%s %s' % (os.environ['USER'], os.environ['USER'], OW_OUT_DIR))
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    raise
 
 #try:
 #    os.system('sudo chown -R %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
@@ -54,7 +71,7 @@ DEFAULTS = {'duration': 50.0, # 50 ms
             'configuration': 'worm_crawl_half_resolution',
             'noc302': False,
             'datareader': 'UpdatedSpreadsheetDataReader',
-            'outDir': os.path.join(os.environ['HOME'], 'shared')} 
+            'outDir': OW_OUT_DIR} 
 
 
 
