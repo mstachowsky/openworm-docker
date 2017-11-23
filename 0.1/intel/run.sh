@@ -4,7 +4,8 @@ OW_OUT_DIR=/home/ow/shared
 
 xhost +
 
-docker run -ti \
+docker run -d \
+  --name openworm \
   --device=/dev/dri:/dev/dri \
   -e DISPLAY=$DISPLAY \
   -e OW_OUT_DIR=$OW_OUT_DIR \
@@ -12,4 +13,4 @@ docker run -ti \
   --privileged \
   -v $HOME/shared:$OW_OUT_DIR:rw \
   openworm-intel:0.1 \
-  /bin/bash
+  python master_openworm.py

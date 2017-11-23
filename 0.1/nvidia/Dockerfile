@@ -12,13 +12,6 @@ COPY ./silent-intel-sdk.cfg /tmp/silent-intel-sdk.cfg
 ARG USR=ow
 ENV USER=$USR
 
-
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get dist-upgrade -y
-
-
-
 RUN mkdir -p /etc/sudoers.d && \
   export uid=1000 gid=1000 && \
   mkdir -p /home/$USER && \
@@ -35,7 +28,10 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 #RUN useradd -ms /bin/bash $USER
 
 
-RUN apt-get install -y apt-utils \
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  apt-get dist-upgrade -y && \
+  apt-get install -y --no-install-recommends apt-utils \
   wget \
   nano \
   htop \
@@ -59,19 +55,15 @@ RUN apt-get install -y apt-utils \
   libxext-dev libncurses-dev python-dev mercurial \
   freeglut3-dev libglu1-mesa-dev libglew-dev python-dev python-pip python-lxml python-numpy python-scipy python-tk \
   kmod dkms \
-  linux-source linux-headers-$(uname -r) \
+  linux-source linux-headers-generic \
   maven openjdk-8-jdk \
   python-setuptools python-yaml libnuma1 \
-  openmpi-bin  libopenmpi-dev
+  openmpi-bin  libopenmpi-dev libfreetype6-dev libpng12-dev libxft-dev xubuntu-desktop 
 
 RUN sudo apt-get install -y python-matplotlib
 #RUN  sudo pip install --upgrade matplotlib
 
-RUN apt-get install -y --no-install-recommends xubuntu-desktop 
-
 #RUN sudo apt-get install nvidia-opencl-dev
-
-RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
 
 USER $USER
 ENV HOME /home/$USER
