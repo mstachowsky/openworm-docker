@@ -34,7 +34,7 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 #RUN useradd -ms /bin/bash $USER
 
 
-RUN apt-get install -y apt-utils \
+RUN apt-get install -y --no-install-recommends apt-utils \
   wget \
   nano \
   htop \
@@ -58,17 +58,14 @@ RUN apt-get install -y apt-utils \
   libxext-dev libncurses-dev python-dev mercurial \
   freeglut3-dev libglu1-mesa-dev libglew-dev python-dev python-pip python-lxml python-numpy python-scipy python-tk \
   kmod dkms \
-  linux-source linux-headers-$(uname -r) \
+  linux-source linux-headers-generic \
   maven openjdk-8-jdk \
   python-setuptools python-yaml libnuma1 \
   openmpi-bin  libopenmpi-dev \
-  libgl1-mesa-glx libgl1-mesa-dri
-RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
+  libgl1-mesa-glx libgl1-mesa-dri libfreetype6-dev \ 
+  libpng12-dev libxft-dev python-matplotlib xubuntu-desktop
 
-RUN sudo apt-get install -y python-matplotlib
-#RUN  sudo pip install --upgrade matplotlib
-
-RUN apt-get install -y --no-install-recommends xubuntu-desktop 
+#RUN  sudo pip install --upgrade matplotlib 
 
 #RUN sudo apt-get install nvidia-opencl-dev
 
@@ -77,9 +74,6 @@ RUN sudo usermod -a -G video $USER
 USER $USER
 ENV HOME /home/$USER
 WORKDIR $HOME
-
-
-
 
 RUN mkdir neuron && \
   cd neuron && \
@@ -100,8 +94,6 @@ RUN mkdir neuron && \
   cd src/nrnpython && \
   sudo python setup.py install
 
-
-
 RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   tar xvf intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   cd intel_sdk_for_opencl_$INTEL_SDK_VERSION && \
@@ -109,8 +101,6 @@ RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/in
   cd $HOME && \
   rm intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   sudo rm /tmp/silent-intel-sdk.cfg
-
-RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
 
 RUN git clone https://github.com/lungd/jNeuroML.git && \
   cd jNeuroML && \
@@ -136,7 +126,6 @@ RUN git clone https://github.com/lungd/sibernetic.git && \
   git checkout ow-0.1 && \
   make clean && make all
 
-
 ENV JNML_HOME=$HOME/jNeuroML
 ENV PATH=$PATH:$JNML_HOME
 ENV IV=$HOME/neuron/iv
@@ -147,6 +136,5 @@ ENV NEURON_HOME=$N/$CPU
 ENV C302_HOME=$HOME/CElegansNeuroML/CElegans/pythonScripts/c302
 ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
-
 
 COPY ./master_openworm.py $HOME/master_openworm.py
