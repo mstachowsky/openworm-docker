@@ -43,7 +43,7 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 #RUN useradd -ms /bin/bash $USER
 
 
-RUN apt-get install -y apt-utils \
+RUN apt-get install --no-install-recommends -y apt-utils \
   wget \
   nano \
   htop \
@@ -67,12 +67,11 @@ RUN apt-get install -y apt-utils \
   libxext-dev libncurses-dev python-dev mercurial \
   freeglut3-dev libglu1-mesa-dev libglew-dev python-dev python-lxml python-numpy python-scipy python-matplotlib python-tk \
   kmod dkms \
-  linux-source linux-headers-$(uname -r) \
+  linux-source linux-headers-generic \
   maven openjdk-8-jdk \
   python-setuptools python-yaml libnuma1 \
-  openmpi-bin  libopenmpi-dev
+  openmpi-bin  libopenmpi-dev xubuntu-desktop 
 
-RUN apt-get install -y --no-install-recommends xubuntu-desktop 
 
 #RUN sudo apt-get install nvidia-opencl-dev
 
