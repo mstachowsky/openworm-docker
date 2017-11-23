@@ -1,43 +1,11 @@
 from __future__ import print_function
 from subprocess import call, Popen, PIPE
 import os
+import pwd
 import shlex
 import sys
 
-sys.path.append(os.environ['C302_HOME']) 
-
-try:
-    os.system('xhost +')
-except:
-    print("Unexpected error: %s" % sys.exc_info()[0])
-
-
-try:
-    os.system('sudo chown -R %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
-except:
-    print("Unexpected error: %s" % sys.exc_info()[0])
-    raise
-
-
-try:
-    execute_with_realtime_output('make clean && make all', os.environ['SIBERNETIC_HOME'])
-except KeyboardInterrupt as e:
-    sys.exit()
-
-
-
-DEFAULTS = {'duration': 50.0, # 50 ms
-            'dt': 0.005,
-            'dtNrn': 0.05,
-            'logstep': 100,
-            'reference': 'FW',
-            'c302params': 'C2',
-            'verbose': False,
-            'device': 'ALL',
-            'configuration': 'worm_crawl_half_resolution',
-            'noc302': False,
-            'datareader': 'UpdatedSpreadsheetDataReader',
-            'outDir': os.path.join(os.environ['HOME'], 'shared')} 
+OW_OUT_DIR = os.environ['OW_OUT_DIR']
 
 def execute_with_realtime_output(command, directory, env=None):
     p = None
@@ -52,6 +20,60 @@ def execute_with_realtime_output(command, directory, env=None):
         if p:
             p.kill()
         raise e
+
+
+sys.path.append(os.environ['C302_HOME']) 
+
+try:
+    os.system('xhost +')
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+
+
+try:
+    # dirty hack to fix an issue changing the output directory of Sibernetic
+    os.system('ln -s %s %s' % (OW_OUT_DIR, os.path.join(os.environ['SIBERNETIC_HOME'], 'simulations')))
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    raise
+
+
+try:
+    if pwd.getpwuid(os.stat(OW_OUT_DIR).st_uid).pw_name != os.environ['USER']:
+        os.system('sudo chown -R %s:%s %s' % (os.environ['USER'], os.environ['USER'], OW_OUT_DIR))
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    raise
+
+#try:
+#    os.system('sudo chown -R %s:%s %s' % ('ow', 'ow', os.environ['HOME']))
+#except:
+#    print("Unexpected error: %s" % sys.exc_info()[0])
+#    raise
+
+
+#try:
+#    execute_with_realtime_output('make clean', os.environ['SIBERNETIC_HOME'])
+#    execute_with_realtime_output('make all', os.environ['SIBERNETIC_HOME'])
+#except KeyboardInterrupt as e:
+#    sys.exit()
+
+
+
+DEFAULTS = {'duration': 50.0, # 50 ms
+            'dt': 0.005,
+            'dtNrn': 0.05,
+            'logstep': 100,
+            'reference': 'FW',
+            'c302params': 'C2',
+            'verbose': False,
+            'device': 'ALL',
+            'configuration': 'worm_crawl_half_resolution',
+            'noc302': False,
+            'datareader': 'UpdatedSpreadsheetDataReader',
+            'outDir': OW_OUT_DIR} 
+
+
 
 print("****************************")
 print("OpenWorm Master Script v.0.1")

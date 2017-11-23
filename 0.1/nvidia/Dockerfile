@@ -2,6 +2,13 @@ FROM ubuntu:16.04
 
 MAINTAINER David Lung "lungdm@gmail.com"
 
+
+ARG NVIDIA_VERSION=375.82
+ARG INTEL_SDK_VERSION=2017_7.0.0.2511_x64
+
+COPY ./silent-intel-sdk.cfg /tmp/silent-intel-sdk.cfg
+
+
 ARG USR=ow
 ENV USER=$USR
 
@@ -28,7 +35,7 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 #RUN useradd -ms /bin/bash $USER
 
 
-RUN apt-get install --no-install-recommends -y apt-utils \
+RUN apt-get install -y apt-utils \
   wget \
   nano \
   htop \
@@ -52,19 +59,19 @@ RUN apt-get install --no-install-recommends -y apt-utils \
   libxext-dev libncurses-dev python-dev mercurial \
   freeglut3-dev libglu1-mesa-dev libglew-dev python-dev python-pip python-lxml python-numpy python-scipy python-tk \
   kmod dkms \
-  linux-source linux-headers-generic \
+  linux-source linux-headers-$(uname -r) \
   maven openjdk-8-jdk \
   python-setuptools python-yaml libnuma1 \
-<<<<<<< HEAD
-  openmpi-bin  libopenmpi-dev xubuntu-desktop 
-=======
-  openmpi-bin  libopenmpi-dev && \
-  sudo pip install --upgrade matplotlib
->>>>>>> lungd/master
+  openmpi-bin  libopenmpi-dev
 
+RUN sudo apt-get install -y python-matplotlib
+#RUN  sudo pip install --upgrade matplotlib
+
+RUN apt-get install -y --no-install-recommends xubuntu-desktop 
 
 #RUN sudo apt-get install nvidia-opencl-dev
 
+RUN sudo apt-get install -y libfreetype6-dev libpng12-dev libxft-dev
 
 USER $USER
 ENV HOME /home/$USER
@@ -73,14 +80,16 @@ WORKDIR $HOME
 
 RUN mkdir neuron && \
   cd neuron && \
-  git clone https://github.com/nrnhines/iv.git && \
-  git clone https://github.com/nrnhines/nrn.git && \
+  git clone https://github.com/lungd/iv.git && \
+  git clone https://github.com/lungd/nrn.git && \
   cd iv && \
+  git checkout ow-0.1 && \
   ./build.sh && \
   ./configure --prefix=`pwd` && \
   make && \
   sudo make install && \
   cd ../nrn && \
+  git checkout ow-0.1 && \
   ./build.sh && \
   ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python && \
   make && \
@@ -89,36 +98,53 @@ RUN mkdir neuron && \
   sudo python setup.py install
 
 
-#RUN sudo mv /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGL.so.BAK && \
-#  sudo ln -s /usr/lib/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.so
+RUN wget http://us.download.nvidia.com/XFree86/Linux-x86_64/$NVIDIA_VERSION/NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run && \
+  sudo chmod +x NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run && \
+  sudo service lightdm stop && \
+  sudo ./NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run -s -N --no-kernel-module && \
+  sudo rm NVIDIA-Linux-x86_64-$NVIDIA_VERSION.run && \
+  sudo service lightdm start
+
+RUN sudo mv /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGL.so.BAK && \
+  sudo ln -s /usr/lib/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.so
 
 
-RUN git clone https://github.com/NeuroML/jNeuroML.git && \
+RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
+  tar xvf intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
+  cd intel_sdk_for_opencl_$INTEL_SDK_VERSION && \
+  sudo ./install.sh --silent /tmp/silent-intel-sdk.cfg && \
+  cd $HOME && \
+  rm intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
+  sudo rm /tmp/silent-intel-sdk.cfg
+
+
+
+RUN git clone https://github.com/lungd/jNeuroML.git && \
   cd jNeuroML && \
-  git checkout development && \
-  python getNeuroML.py development
+  git checkout ow-0.1 && \
+  python getNeuroML.py ow-0.1
   
 RUN git clone https://github.com/lungd/pyNeuroML.git && \
   cd pyNeuroML && \
+  git checkout ow-0.1 && \
   sudo python setup.py install
 
-RUN git clone https://github.com/openworm/PyOpenWorm.git && \
+RUN git clone https://github.com/lungd/PyOpenWorm.git && \
   cd PyOpenWorm && \
-  git checkout dev && \
+  git checkout ow-0.1 && \
   sudo python setup.py install
 
 RUN git clone https://github.com/lungd/CElegansNeuroML.git && \
   cd CElegansNeuroML && \
-  git checkout tmp
+  git checkout ow-0.1
 
 RUN git clone https://github.com/lungd/sibernetic.git && \
   cd sibernetic && \
-  git checkout v0.1
-# && \
-#  make clean && make all
+  git checkout ow-0.1 && \
+  make clean && make all
 
 
-ENV JNML_HOME=$HOME/neuroml_dev/jNeuroML
+ENV JNML_HOME=$HOME/jNeuroML
 ENV PATH=$PATH:$JNML_HOME
 ENV IV=$HOME/neuron/iv
 ENV N=$HOME/neuron/nrn
@@ -130,10 +156,4 @@ ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
 
 
-
 COPY ./master_openworm.py $HOME/master_openworm.py
-COPY ./install-intel-sdk.sh $HOME/install-intel-sdk.sh
-COPY ./install-nvidia-drivers.sh $HOME/install-nvidia-drivers.sh
-COPY ./silent-intel-sdk.cfg $HOME/silent-intel-sdk.cfg
-
-#RUN sudo chown -R $USER:$USER $HOME
