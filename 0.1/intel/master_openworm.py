@@ -1,4 +1,8 @@
 from __future__ import print_function
+import errno
+import matplotlib
+matplotlib.use('Agg')
+import shutil
 from subprocess import call, Popen, PIPE
 import os
 import pwd
@@ -96,6 +100,18 @@ print("Step 2: Execute the latest c302 simulation")
 print("****************************")
 
 from runAndPlot import run_c302
+
+orig_display_var = None
+if os.environ.has_key('DISPLAY'):
+    orig_display_var = os.environ['DISPLAY']
+    del os.environ['DISPLAY'] # https://www.neuron.yale.edu/phpBB/viewtopic.php?f=6&t=1603
+
+
+
+
+
+
+
 run_c302(DEFAULTS['reference'], 
          DEFAULTS['c302params'], 
          '', 
@@ -105,8 +121,27 @@ run_c302(DEFAULTS['reference'],
          data_reader=DEFAULTS['datareader'], 
          save=True, 
          show_plot_already=False,
-         target_directory=os.path.join(DEFAULTS['outDir'], 'c302_out'),
-         save_fig_to='examples')
+         target_directory=os.path.join(os.environ['C302_HOME'], 'examples'),
+         save_fig_to='tmp_images')
+
+prev_dir = os.getcwd()
+os.chdir(DEFAULTS['outDir'])
+try:
+    os.mkdir('c302_out')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+src_files = os.listdir(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
+for file_name in src_files:
+    full_file_name = os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images', file_name)
+    print("COPY %s" % full_file_name)
+    if (os.path.isfile(full_file_name)):
+        shutil.copy2(full_file_name, 'c302_out')
+shutil.rmtree(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
+os.chdir(prev_dir)
+if orig_display_var:
+    os.environ['DISPLAY'] = orig_display_var
 
 
 print("****************************")

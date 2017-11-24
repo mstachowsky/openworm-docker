@@ -88,11 +88,20 @@ RUN mkdir neuron && \
   cd ../nrn && \
   git checkout ow-0.1 && \
   ./build.sh && \
-  ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python && \
+  ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python --with-paranrn && \
   make && \
   sudo make install && \
   cd src/nrnpython && \
   sudo python setup.py install
+
+RUN mkdir intel-opencl && \
+  wget http://registrationcenter-download.intel.com/akdlm/irc_nas/11396/SRB5.0_linux64.zip && \
+  unzip SRB5.0_linux64.zip && \
+  tar -C intel-opencl -Jxf intel-opencl-r5.0-63503.x86_64.tar.xz && \
+  tar -C intel-opencl -Jxf intel-opencl-devel-r5.0-63503.x86_64.tar.xz && \
+  tar -C intel-opencl -Jxf intel-opencl-cpu-r5.0-63503.x86_64.tar.xz && \
+  sudo cp -R intel-opencl/* / && \
+  sudo ldconfig
 
 RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   tar xvf intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
