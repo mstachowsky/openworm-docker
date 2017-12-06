@@ -90,7 +90,7 @@ RUN mkdir neuron && \
   cd ../nrn && \
   git checkout ow-0.1 && \
   ./build.sh && \
-  ./configure --prefix=`pwd` --with-iv=$HOME/neuron/iv --with-nrnpython=/usr/bin/python --with-paranrn && \
+  ./configure --prefix=`pwd` --without-iv --with-nrnpython=/usr/bin/python --with-paranrn && \
   make && \
   sudo make install && \
   cd src/nrnpython && \

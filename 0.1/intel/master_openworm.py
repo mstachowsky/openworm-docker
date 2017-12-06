@@ -149,9 +149,16 @@ print("Step 3: Feed muscle activations into Sibernetic")
 print("****************************")
 print("not yet implemented.")
 
-
 print("****************************")
-print("Step 4: Run Sibernetic")
+print("Step 4.1: Start movie recording in background of Sibernetic run for visual inspection")
+print("****************************")
+try:
+    os.system('bash get_sibernetic_movie.sh')
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+    
+print("****************************")
+print("Step 4.2: Run Sibernetic")
 print("****************************")
 """try:
     os.chdir("/sibernetic")
@@ -165,7 +172,7 @@ except:
     print "Unexpected error:", sys.exc_info()[0]
     raise"""
 
-''''
+
 try:
     command = """python sibernetic_c302.py 
                 -duration %s 
@@ -192,14 +199,7 @@ try:
     execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
-'''
-print("****************************")
-print("Step 4.1: Create Movie from Sibernetic run for visual inspection")
-print("****************************")
-try:
-    os.system('bash get_sibernetic_movie.sh')
-except:
-    print("Unexpected error: %s" % sys.exc_info()[0])
+
 
 
 print("****************************")
