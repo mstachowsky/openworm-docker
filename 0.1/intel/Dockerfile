@@ -63,7 +63,9 @@ RUN apt-get install -y --no-install-recommends apt-utils \
   python-setuptools python-yaml libnuma1 \
   openmpi-bin  libopenmpi-dev \
   libgl1-mesa-glx libgl1-mesa-dri libfreetype6-dev \ 
-  libpng12-dev libxft-dev python-matplotlib xubuntu-desktop ffmpeg xvfb
+  libpng12-dev libxft-dev python-matplotlib xubuntu-desktop 
+  
+RUN sudo apt-get install -y --no-install-recommends ffmpeg xvfb
 
 #RUN  sudo pip install --upgrade matplotlib 
 
@@ -145,5 +147,7 @@ ENV NEURON_HOME=$N/$CPU
 ENV C302_HOME=$HOME/CElegansNeuroML/CElegans/pythonScripts/c302
 ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
+
+COPY ./get_sibernetic_movie.sh $HOME/get_sibernetic_movie.sh
 
 COPY ./master_openworm.py $HOME/master_openworm.py

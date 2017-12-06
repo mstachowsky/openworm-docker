@@ -64,7 +64,7 @@ except:
 
 
 
-DEFAULTS = {'duration': 50.0, # 50 ms
+DEFAULTS = {'duration': 5.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
@@ -111,7 +111,7 @@ if os.environ.has_key('DISPLAY'):
 
 
 
-
+"""
 run_c302(DEFAULTS['reference'], 
          DEFAULTS['c302params'], 
          '', 
@@ -142,7 +142,7 @@ shutil.rmtree(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
 os.chdir(prev_dir)
 if orig_display_var:
     os.environ['DISPLAY'] = orig_display_var
-
+"""
 
 print("****************************")
 print("Step 3: Feed muscle activations into Sibernetic")
@@ -165,6 +165,7 @@ except:
     print "Unexpected error:", sys.exc_info()[0]
     raise"""
 
+''''
 try:
     command = """python sibernetic_c302.py 
                 -duration %s 
@@ -191,6 +192,15 @@ try:
     execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
+'''
+print("****************************")
+print("Step 4.1: Create Movie from Sibernetic run for visual inspection")
+print("****************************")
+try:
+    os.system('bash get_sibernetic_movie.sh')
+except:
+    print("Unexpected error: %s" % sys.exc_info()[0])
+
 
 print("****************************")
 print("Step 5: Extract skeleton from Sibernetic run for movement analysis")
