@@ -188,7 +188,7 @@ try:
                 DEFAULTS['datareader'],
                 'simulations') 
                 #DEFAULTS['outDir'])
-    #execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
 
