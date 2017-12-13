@@ -34,7 +34,7 @@ ENV DEBIAN_FRONTEND noninteractive # TODO: change
 #RUN useradd -ms /bin/bash $USER
 
 
-RUN apt-get install -y --no-install-recommends apt-utils \
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils \
   wget \
   nano \
   htop \
