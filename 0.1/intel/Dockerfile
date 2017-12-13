@@ -63,7 +63,7 @@ RUN apt-get install -y --no-install-recommends apt-utils \
   python-setuptools python-yaml libnuma1 \
   openmpi-bin  libopenmpi-dev \
   libgl1-mesa-glx libgl1-mesa-dri libfreetype6-dev \ 
-  libpng12-dev libxft-dev python-matplotlib xubuntu-desktop ffmpeg xvfb
+  libpng12-dev libxft-dev python-matplotlib xubuntu-desktop ffmpeg xvfb tmux
 
 #RUN  sudo pip install --upgrade matplotlib 
 

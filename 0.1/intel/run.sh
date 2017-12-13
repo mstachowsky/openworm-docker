@@ -13,4 +13,4 @@ docker run -d \
   --privileged \
   -v $HOME/shared:$OW_OUT_DIR:rw \
   openworm-intel:0.1 \
-  python master_openworm.py
+  DISPLAY=:44 python master_openworm.py

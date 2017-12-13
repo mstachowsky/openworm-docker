@@ -8,6 +8,7 @@ import os
 import pwd
 import shlex
 import sys
+import time
 
 OW_OUT_DIR = os.environ['OW_OUT_DIR']
 
@@ -64,7 +65,7 @@ except:
 
 
 
-DEFAULTS = {'duration': 50.0, # 50 ms
+DEFAULTS = {'duration': 5.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
@@ -98,7 +99,7 @@ print("not yet implemented.")
 print("****************************")
 print("Step 2: Execute the latest c302 simulation")
 print("****************************")
-
+"""
 from runAndPlot import run_c302
 
 orig_display_var = None
@@ -142,7 +143,7 @@ shutil.rmtree(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
 os.chdir(prev_dir)
 if orig_display_var:
     os.environ['DISPLAY'] = orig_display_var
-
+"""
 
 print("****************************")
 print("Step 3: Feed muscle activations into Sibernetic")
@@ -191,6 +192,53 @@ try:
     execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
+
+
+all_subdirs = []
+for dirpath, dirnames, filenames in os.walk('/home/ow/shared'):
+    for directory in dirnames:
+        if directory.startswith('C2_FW'):
+            all_subdirs.append(os.path.join(dirpath, directory))
+
+#all_subdirs = [d for d in os.listdir(OW_OUT_DIR) if (os.path.isdir(d) and d.startswith('%s_%s' % (DEFAULTS['c302params'], DEFAULTS['reference'])))]
+#print(all_subdirs)
+latest_subdir = max(all_subdirs, key=os.path.getmtime)
+
+
+os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &') # TODO: terminate xvfb after recording
+os.system('export DISPLAY=:44')
+sibernetic_movie_name = 'sibernetic_%s.mp4' % os.path.split(latest_subdir)[-1]
+os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/%s"' % sibernetic_movie_name)
+#os.system('DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic_%s.webm &' % os.path.split(latest_subdir)[-1])
+
+command = './Release/Sibernetic -f %s -l_from lpath=%s' % (DEFAULTS['configuration'], latest_subdir)
+execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+
+os.system('tmux send-keys -t SiberneticRecording q')
+
+#ffmpeg_pids = os.system('pgrep ffmpeg')
+#if isinstance(ffmpeg_pids, int):
+#    ffmpeg_pids=[ffmpeg_pids]
+#for ffmpeg_pid in ffmpeg_pids:
+#    os.system('kill -9 %s' % ffmpeg_pid)
+
+
+time.sleep(3)
+
+# SPEED-UP
+try:
+    os.mkdir('tmp')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+os.system('ffmpeg -ss 1 -i /home/ow/shared/%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (sibernetic_movie_name, 'tmp/out%06d.jpg'))
+os.system('ffmpeg -r 100 -i %s -r 100 -vb 60M /home/ow/shared/speeded_%s.mp4' % ('tmp/out%06d.jpg', sibernetic_movie_name))
+
+#os.system('ffmpeg -ss 1 -i %s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 tmp/out%06d.jpg' % sibernetic_movie_name)
+#os.system('ffmpeg -r 100 -i tmp/out%06d.jpg -r 100 -vb 60M speeded_%s.mp4' % sibernetic_movie_name)
+os.system('sudo rm -r tmp/*')
+
 
 print("****************************")
 print("Step 5: Extract skeleton from Sibernetic run for movement analysis")
