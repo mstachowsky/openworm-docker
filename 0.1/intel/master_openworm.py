@@ -64,7 +64,7 @@ except:
 
 
 
-DEFAULTS = {'duration': 50.0, # 50 ms
+DEFAULTS = {'duration': 5.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
@@ -98,7 +98,7 @@ print("not yet implemented.")
 print("****************************")
 print("Step 2: Execute the latest c302 simulation")
 print("****************************")
-
+"""
 from runAndPlot import run_c302
 
 orig_display_var = None
@@ -142,7 +142,7 @@ shutil.rmtree(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
 os.chdir(prev_dir)
 if orig_display_var:
     os.environ['DISPLAY'] = orig_display_var
-
+"""
 
 print("****************************")
 print("Step 3: Feed muscle activations into Sibernetic")
@@ -188,9 +188,45 @@ try:
                 DEFAULTS['datareader'],
                 'simulations') 
                 #DEFAULTS['outDir'])
-    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+    #execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
+
+
+all_subdirs = []
+for dirpath, dirnames, filenames in os.walk('/home/ow/shared'):
+    for directory in dirnames:
+        if directory.startswith('C2_FW'):
+            all_subdirs.append(os.path.join(dirpath, directory))
+
+#all_subdirs = [d for d in os.listdir(OW_OUT_DIR) if (os.path.isdir(d) and d.startswith('%s_%s' % (DEFAULTS['c302params'], DEFAULTS['reference'])))]
+#print(all_subdirs)
+latest_subdir = max(all_subdirs, key=os.path.getmtime)
+
+
+os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &')
+os.system('export DISPLAY=:44')
+os.system('DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic.webm &')
+
+
+
+command = './Release/Sibernetic -f %s -l_from lpath=%s' % (DEFAULTS['configuration'], latest_subdir)
+#execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+
+
+ffmpeg_pids = os.system('pgrep ffmpeg')
+if isinstance(ffmpeg_pids, int):
+    ffmpeg_pids=[ffmpeg_pids]
+for ffmpeg_pid in ffmpeg_pids:
+    os.system('kill -9 %s' % ffmpeg_pid)
+
+
+
+
+
+
+
 
 print("****************************")
 print("Step 5: Extract skeleton from Sibernetic run for movement analysis")
