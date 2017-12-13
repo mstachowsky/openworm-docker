@@ -8,6 +8,7 @@ import os
 import pwd
 import shlex
 import sys
+import time
 
 OW_OUT_DIR = os.environ['OW_OUT_DIR']
 
@@ -206,7 +207,8 @@ latest_subdir = max(all_subdirs, key=os.path.getmtime)
 
 os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &') # TODO: terminate xvfb after recording
 os.system('export DISPLAY=:44')
-os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic_%s.mp4"' % os.path.split(latest_subdir)[-1])
+sibernetic_movie_name = 'sibernetic_%s.mp4' % os.path.split(latest_subdir)[-1]
+os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/%s"' % sibernetic_movie_name)
 #os.system('DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic_%s.webm &' % os.path.split(latest_subdir)[-1])
 
 command = './Release/Sibernetic -f %s -l_from lpath=%s' % (DEFAULTS['configuration'], latest_subdir)
@@ -221,10 +223,21 @@ os.system('tmux send-keys -t SiberneticRecording q')
 #    os.system('kill -9 %s' % ffmpeg_pid)
 
 
+time.sleep(3)
 
+# SPEED-UP
+try:
+    os.mkdir('tmp')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
 
+os.system('ffmpeg -ss 1 -i /home/ow/shared/%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (sibernetic_movie_name, 'tmp/out%06d.jpg'))
+os.system('ffmpeg -r 100 -i %s -r 100 -vb 60M /home/ow/shared/speeded_%s.mp4' % ('tmp/out%06d.jpg', sibernetic_movie_name))
 
-
+#os.system('ffmpeg -ss 1 -i %s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 tmp/out%06d.jpg' % sibernetic_movie_name)
+#os.system('ffmpeg -r 100 -i tmp/out%06d.jpg -r 100 -vb 60M speeded_%s.mp4' % sibernetic_movie_name)
+os.system('sudo rm -r tmp/*')
 
 
 print("****************************")
