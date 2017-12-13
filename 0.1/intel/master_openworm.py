@@ -188,7 +188,7 @@ try:
                 DEFAULTS['datareader'],
                 'simulations') 
                 #DEFAULTS['outDir'])
-    #execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 except KeyboardInterrupt as e:
     pass
 
@@ -204,9 +204,9 @@ for dirpath, dirnames, filenames in os.walk('/home/ow/shared'):
 latest_subdir = max(all_subdirs, key=os.path.getmtime)
 
 
-os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &')
+os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &') # TODO: terminate xvfb after recording
 os.system('export DISPLAY=:44')
-os.system('DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic.webm &')
+os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/sibernetic_%s.mp4"' % os.path.split(latest_subdir)[-1])
 
 
 
@@ -214,12 +214,13 @@ command = './Release/Sibernetic -f %s -l_from lpath=%s' % (DEFAULTS['configurati
 #execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
 
+os.system('tmux send-keys -t SiberneticRecording q')
 
-ffmpeg_pids = os.system('pgrep ffmpeg')
-if isinstance(ffmpeg_pids, int):
-    ffmpeg_pids=[ffmpeg_pids]
-for ffmpeg_pid in ffmpeg_pids:
-    os.system('kill -9 %s' % ffmpeg_pid)
+#ffmpeg_pids = os.system('pgrep ffmpeg')
+#if isinstance(ffmpeg_pids, int):
+#    ffmpeg_pids=[ffmpeg_pids]
+#for ffmpeg_pid in ffmpeg_pids:
+#    os.system('kill -9 %s' % ffmpeg_pid)
 
 
 
