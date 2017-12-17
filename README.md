@@ -15,9 +15,8 @@ We have put together a [docker container](http://docker.com) that pulls together
 
 ![Worm Crawling](img/worm-crawling.gif)
 
-![Muscle Activity](img/muscle-activity.png)
-
-![Neuron Activity](img/muscle-activity.png)
+<img src="img/muscle-activity.png" width="300">
+<img src="img/neuron-activity.png" width="400">
 
 **Installation**
 
