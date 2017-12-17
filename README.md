@@ -7,9 +7,17 @@ Quickstart
 We have put together a [docker container](http://docker.com) that pulls together the major components of our simulation and runs it on your machine.  When you get it all running it do the following:
 
 1. Run our nervous system model, known as c302, on your computer.  
-2. Produce graphs from the output of the nervous system model that demonstrate its output on your computer for you to inspect.
-3. Run our body model, known as sibernetic, on your computer, using the output of the nervous system model.
+2. Run our body model, known as sibernetic, on your computer, using the output of the nervous system model.
+3. Produce graphs from the output of the nervous system model that demonstrate its output on your computer for you to inspect.
 4. Produce a movie showing the output of the body model for you to inspect.
+
+**Example Output**
+
+![Worm Crawling](img/worm-crawling.gif)
+
+![Muscle Activity](img/muscle-activity.gif)
+
+![Neuron Activity](img/muscle-activity.gif)
 
 **Installation**
 
