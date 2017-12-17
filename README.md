@@ -22,8 +22,7 @@ We have put together a [docker container](http://docker.com) that pulls together
 
 ![Worm Crawling](img/worm-crawling.gif)
 
-<img src="img/muscle-activity.png" width="250">
-<img src="img/neuron-activity.png" width="400">
+<img src="img/muscle-activity.png" width="250"><img src="img/neuron-activity.png" width="350">
 
 **Installation**
 
