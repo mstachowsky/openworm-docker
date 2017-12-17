@@ -21,10 +21,13 @@ Pre-requisites:
 To Install:
 
 1. Install [Docker](http://docker.com) on your system.  
-2. Open a terminal and run 'run.sh'
-3. About 5-10 minutes of output will display on the screen as the steps run
-4. The simulation will end.  Run 'stop.sh' on your system to clean up the running container.
-5. Inspect the output in the `output` directory.
+
+To Run: 
+
+1. Open a terminal and run 'run.sh'
+2. About 5-10 minutes of output will display on the screen as the steps run
+3. The simulation will end.  Run 'stop.sh' on your system to clean up the running container.
+4. Inspect the output in the `output` directory.
 
 Documentation
 -------------

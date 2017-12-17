@@ -12,5 +12,5 @@ docker run -d \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   --privileged \
   -v $HOME/shared:$OW_OUT_DIR:rw \
-  openworm-intel:0.1 \
+  openworm/openworm:0.7 \
   DISPLAY=:44 python master_openworm.py
