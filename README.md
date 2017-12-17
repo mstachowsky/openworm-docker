@@ -22,7 +22,7 @@ We have put together a [docker container](http://docker.com) that pulls together
 
 ![Worm Crawling](img/worm-crawling.gif)
 
-<img src="img/muscle-activity.png" width="300">
+<img src="img/muscle-activity.png" width="250">
 <img src="img/neuron-activity.png" width="400">
 
 **Installation**
@@ -38,16 +38,17 @@ To Install:
 
 **Running**
 
-1. Open a terminal and run 'run.sh'
+1. Open a terminal and run `run.sh`
 2. About 5-10 minutes of output will display on the screen as the steps run
-3. The simulation will end.  Run 'stop.sh' on your system to clean up the running container.
+3. The simulation will end.  Run `stop.sh` on your system to clean up the running container.
 4. Inspect the output in the `output` directory.
 
 **Advanced**
 
 Try the following to play around with the system:
 
-* Open a terminal and run 'run-with-shell.sh'.  This will let you log into the system before it has run `master_openworm.py`.  From here you can inspect the internals of the various checked out code bases and installed systems and modify things. Afterwards you'll still need to run `stop.sh` to clean up.
+* Open a terminal and run `run-with-shell.sh`.  This will let you log into the system before it has run `master_openworm.py`.  From here you can inspect the internals of the various checked out code bases and installed systems and modify things. Afterwards you'll still need to run `stop.sh` to clean up.
+* If you modify what gets installed, you should modify Dockerfile.  If you modify what runs, you should modify `master_openworm.py`.  Either way you will need to run `build.py` in order to rebuild the image locally.  Afterwards you can run normally.
 
 Documentation
 -------------
