@@ -36,12 +36,18 @@ To Install:
 
 1. Install [Docker](http://docker.com) on your system.  
 
-To Run: 
+**Running**
 
 1. Open a terminal and run 'run.sh'
 2. About 5-10 minutes of output will display on the screen as the steps run
 3. The simulation will end.  Run 'stop.sh' on your system to clean up the running container.
 4. Inspect the output in the `output` directory.
+
+**Advanced**
+
+Try the following to play around with the system:
+
+* Open a terminal and run 'run-with-shell.sh'.  This will let you log into the system before it has run `master_openworm.py`.  From here you can inspect the internals of the various checked out code bases and installed systems and modify things. Afterwards you'll still need to run `stop.sh` to clean up.
 
 Documentation
 -------------
