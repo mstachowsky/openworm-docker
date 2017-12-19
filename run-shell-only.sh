@@ -13,6 +13,6 @@ docker run -ti \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   --privileged \
   -v $HOST_OUT_DIR:$OW_OUT_DIR:rw \
-  openworm-intel:0.1 \
+  openworm:0.7 \
   bash
 
