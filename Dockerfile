@@ -94,14 +94,18 @@ RUN mkdir neuron && \
   cd src/nrnpython && \
   sudo python setup.py install
 
-RUN mkdir intel-opencl && \
+RUN mkdir intel-opencl-tmp && \
+  cd intel-opencl-tmp && \
+  mkdir intel-opencl && \
   wget http://registrationcenter-download.intel.com/akdlm/irc_nas/11396/SRB5.0_linux64.zip && \
   unzip SRB5.0_linux64.zip && \
   tar -C intel-opencl -Jxf intel-opencl-r5.0-63503.x86_64.tar.xz && \
   tar -C intel-opencl -Jxf intel-opencl-devel-r5.0-63503.x86_64.tar.xz && \
   tar -C intel-opencl -Jxf intel-opencl-cpu-r5.0-63503.x86_64.tar.xz && \
   sudo cp -R intel-opencl/* / && \
-  sudo ldconfig
+  sudo ldconfig && \
+  cd .. && \
+  sudo rm -r intel-opencl-tmp
 
 RUN wget http://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/11705/intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
   tar xvf intel_sdk_for_opencl_$INTEL_SDK_VERSION.tgz && \
@@ -146,4 +150,5 @@ ENV C302_HOME=$HOME/CElegansNeuroML/CElegans/pythonScripts/c302
 ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
 
-COPY ./master_openworm.py $HOME/master_openworm.py
+# Not working with --chown=$USER:$USER
+COPY --chown=ow:ow ./master_openworm.py $HOME/master_openworm.py
