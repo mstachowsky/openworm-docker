@@ -37,10 +37,11 @@ To Install:
 
 **Running**
 
-1. Open a terminal and run `run.sh`
-2. About 5-10 minutes of output will display on the screen as the steps run
-3. The simulation will end.  Run `stop.sh` on your system to clean up the running container.
-4. Inspect the output in the `output` directory.
+1. Open a terminal and run `run-with-shell.sh`.
+2. Run `DISPLAY=:44 python master_openworm.py`.
+3. About 5-10 minutes of output will display on the screen as the steps run.
+4. The simulation will end.  Exit the container with `exit` and run `stop.sh` on your system to clean up the running container.
+5. Inspect the output in the `output` directory.
 
 **Advanced**
 

@@ -9,6 +9,7 @@ import pwd
 import shlex
 import sys
 import time
+import glob
 
 print("****************************")
 print("OpenWorm Master Script v.0.7")
@@ -31,7 +32,6 @@ print("Step 2: Execute unit tests via the c302 simulation framework")
 print("****************************")
 """
 from runAndPlot import run_c302
-
 orig_display_var = None
 if os.environ.has_key('DISPLAY'):
     orig_display_var = os.environ['DISPLAY']
@@ -48,7 +48,6 @@ run_c302(DEFAULTS['reference'],
          show_plot_already=False,
          target_directory=os.path.join(os.environ['C302_HOME'], 'examples'),
          save_fig_to='tmp_images')
-
 prev_dir = os.getcwd()
 os.chdir(DEFAULTS['outDir'])
 try:
@@ -56,7 +55,6 @@ try:
 except OSError as e:
     if e.errno != errno.EEXIST:
         raise
-
 src_files = os.listdir(os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images'))
 for file_name in src_files:
     full_file_name = os.path.join(os.environ['C302_HOME'], 'examples', 'tmp_images', file_name)
@@ -97,13 +95,7 @@ try:
 except:
     print("Unexpected error: %s" % sys.exc_info()[0])
 
-
-try:
-    # dirty hack to fix an issue changing the output directory of Sibernetic
-    os.system('ln -s %s %s' % (OW_OUT_DIR, os.path.join(os.environ['SIBERNETIC_HOME'], 'simulations')))
-except:
-    print("Unexpected error: %s" % sys.exc_info()[0])
-    raise
+OW_OUT_DIR = os.environ['OW_OUT_DIR']
 
 
 try:
@@ -113,7 +105,8 @@ except:
     print("Unexpected error: %s" % sys.exc_info()[0])
     raise
 
-DEFAULTS = {'duration': 15.0, # 50 ms
+
+DEFAULTS = {'duration': 5.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
@@ -125,6 +118,11 @@ DEFAULTS = {'duration': 15.0, # 50 ms
             'noc302': False,
             'datareader': 'UpdatedSpreadsheetDataReader',
             'outDir': OW_OUT_DIR} 
+
+my_env = os.environ.copy()
+my_env["DISPLAY"] = ":44"
+
+os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &') # TODO: terminate xvfb after recording
 
 try:
     command = """python sibernetic_c302.py 
@@ -149,29 +147,51 @@ try:
                 DEFAULTS['datareader'],
                 'simulations') 
                 #DEFAULTS['outDir'])
-    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+    execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'], env=my_env)
 except KeyboardInterrupt as e:
     pass
 
+sibernetic_sim_dir = '%s/simulations' % os.environ['SIBERNETIC_HOME']
 
 all_subdirs = []
-for dirpath, dirnames, filenames in os.walk('/home/ow/shared'):
+for dirpath, dirnames, filenames in os.walk(sibernetic_sim_dir):
     for directory in dirnames:
-        if directory.startswith('C2_FW'):
+        if directory.startswith('%s_%s' % (DEFAULTS['c302params'], DEFAULTS['reference'])):
             all_subdirs.append(os.path.join(dirpath, directory))
 
 latest_subdir = max(all_subdirs, key=os.path.getmtime)
 
 
-os.system('Xvfb :44 -listen tcp -ac -screen 0 1920x1080x24+32 &') # TODO: terminate xvfb after recording
+try:
+    os.mkdir('%s/output' % OW_OUT_DIR)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+new_sim_out = '%s/output/%s' % (OW_OUT_DIR, os.path.split(latest_subdir)[-1])
+try:
+    os.mkdir(new_sim_out)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+
+# Copy PNGs, created during the Sibernetic simulation, in a separate child-directory to find them more easily
+figures = glob.glob('%s/*.png' % latest_subdir)
+for figure in figures:
+    shutil.move(figure, new_sim_out)
+
+
+# Rerun and record simulation
 os.system('export DISPLAY=:44')
-sibernetic_movie_name = 'sibernetic_%s.mp4' % os.path.split(latest_subdir)[-1]
-os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an $HOME/shared/%s"' % sibernetic_movie_name)
+sibernetic_movie_name = '%s.mp4' % os.path.split(latest_subdir)[-1]
+os.system('tmux new-session -d -s SiberneticRecording "DISPLAY=:44 ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :44 -filter:v "crop=1200:800:100:100" -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -an %s/%s"' % (new_sim_out, sibernetic_movie_name))
 
 command = './Release/Sibernetic -f %s -l_from lpath=%s' % (DEFAULTS['configuration'], latest_subdir)
-execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'])
+execute_with_realtime_output(command, os.environ['SIBERNETIC_HOME'], env=my_env)
 
 os.system('tmux send-keys -t SiberneticRecording q')
+os.system('tmux send-keys -t SiberneticRecording "exit" C-m')
 
 time.sleep(3)
 
@@ -182,21 +202,18 @@ except OSError as e:
     if e.errno != errno.EEXIST:
         raise
 
-os.system('ffmpeg -ss 1 -i /home/ow/shared/%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (sibernetic_movie_name, 'tmp/out%06d.jpg'))
-os.system('ffmpeg -r 100 -i %s -r 100 -vb 60M /home/ow/shared/speeded_%s.mp4' % ('tmp/out%06d.jpg', sibernetic_movie_name))
+os.system('ffmpeg -ss 1 -i %s/%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (new_sim_out, sibernetic_movie_name, 'tmp/out%06d.jpg'))
+os.system('ffmpeg -r 100 -i %s -r 100 -vb 60M %s/speeded_%s' % ('tmp/out%06d.jpg', new_sim_out, sibernetic_movie_name))
 
 os.system('sudo rm -r tmp/*')
+
+
 
 print("****************************")
 print("Step 4: Run movement analysis")
 print("****************************")
 print("not yet implemented.")
-"""try:
-    os.chdir("/movement_validation/tests")
-    call(["nosetests", "--nocapture"])
-except:
-    print "Unexpected error:", sys.exc_info()[0]
-    raise"""
+
 
 print("****************************")
 print("Step 5: Report on movement analysis fit to real worm videos")
