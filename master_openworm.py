@@ -106,7 +106,7 @@ except:
     raise
 
 
-DEFAULTS = {'duration': 5.0, # 50 ms
+DEFAULTS = {'duration': 15.0, # 50 ms
             'dt': 0.005,
             'dtNrn': 0.05,
             'logstep': 100,
