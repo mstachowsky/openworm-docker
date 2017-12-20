@@ -10,6 +10,7 @@ import shlex
 import sys
 import time
 import glob
+import math
 
 print("****************************")
 print("OpenWorm Master Script v.0.7")
@@ -215,7 +216,10 @@ if black_start_pos != -1:
     black_dur = float(out[black_dur_pos + len('black_duration:'):])
 
 if black_start == 0.0 and black_dur:
+    black_dur = int(math.ceil(black_dur))
     command = 'ffmpeg -ss 00:00:0%s -i %s/%s -c copy -avoid_negative_ts 1 %s/cut_%s' % (black_dur, new_sim_out, sibernetic_movie_name, new_sim_out, sibernetic_movie_name)
+    if black_dur > 9:
+        command = 'ffmpeg -ss 00:00:%s -i %s/%s -c copy -avoid_negative_ts 1 %s/cut_%s' % (black_dur, new_sim_out, sibernetic_movie_name, new_sim_out, sibernetic_movie_name)
     os.system(command)
 
 # SPEED-UP
