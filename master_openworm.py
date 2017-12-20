@@ -3,7 +3,7 @@ import errno
 import matplotlib
 matplotlib.use('Agg')
 import shutil
-from subprocess import call, Popen, PIPE
+from subprocess import call, Popen, PIPE, check_output
 import os
 import pwd
 import shlex
@@ -195,6 +195,29 @@ os.system('tmux send-keys -t SiberneticRecording "exit" C-m')
 
 time.sleep(3)
 
+# Remove black frames at the beginning of the recorded video
+command = "ffmpeg -i %s/%s -vf blackdetect=d=0:pic_th=0.70:pix_th=0.10 -an -f null - 2>&1 | grep blackdetect" % (new_sim_out, sibernetic_movie_name)
+outstr = check_output(command, shell=True)
+outstr = outstr.split('\n')
+
+black_start = 0.0
+black_dur = None
+
+
+out = outstr[0]
+# for out in outstr:
+ 
+black_start_pos = out.find('black_start:')
+black_end_pos = out.find('black_end:')
+black_dur_pos = out.find('black_duration:')
+if black_start_pos != -1:
+    black_start = float(out[black_start_pos + len('black_start:') : black_end_pos])
+    black_dur = float(out[black_dur_pos + len('black_duration:'):])
+
+if black_start == 0.0 and black_dur:
+    command = 'ffmpeg -ss 00:00:0%s -i %s/%s -c copy -avoid_negative_ts 1 %s/cut_%s' % (black_dur, new_sim_out, sibernetic_movie_name, new_sim_out, sibernetic_movie_name)
+    os.system(command)
+
 # SPEED-UP
 try:
     os.mkdir('tmp')
@@ -202,7 +225,7 @@ except OSError as e:
     if e.errno != errno.EEXIST:
         raise
 
-os.system('ffmpeg -ss 1 -i %s/%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (new_sim_out, sibernetic_movie_name, 'tmp/out%06d.jpg'))
+os.system('ffmpeg -ss 1 -i %s/cut_%s -vf "select=gt(scene\,0.1)" -vsync vfr -vf fps=fps=1/1 %s' % (new_sim_out, sibernetic_movie_name, 'tmp/out%06d.jpg'))
 os.system('ffmpeg -r 100 -i %s -r 100 -vb 60M %s/speeded_%s' % ('tmp/out%06d.jpg', new_sim_out, sibernetic_movie_name))
 
 os.system('sudo rm -r tmp/*')
