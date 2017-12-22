@@ -13,8 +13,8 @@ Quickstart
 ----------
 We have put together a [docker container](http://docker.com) that pulls together the major components of our simulation and runs it on your machine.  When you get it all running it do the following:
 
-1. Run our nervous system model, known as c302, on your computer.  
-2. Run our body model, known as sibernetic, on your computer, using the output of the nervous system model.
+1. Run our nervous system model, known as [c302](https://github.com/openworm/CElegansNeuroML/tree/master/CElegans/pythonScripts/c302), on your computer.  
+2. Run our body model, known as [Sibernetic](https://github.com/openworm/sibernetic), on your computer, using the output of the nervous system model.
 3. Produce graphs from the output of the nervous system model that demonstrate its output on your computer for you to inspect.
 4. Produce a movie showing the output of the body model for you to inspect.
 
@@ -37,7 +37,7 @@ To Install:
 
 **Running**
 
-1. Open a terminal and run `run-with-shell.sh`.
+1. Open a terminal and run `run-shell-only.sh`.
 2. Run `DISPLAY=:44 python master_openworm.py`.
 3. About 5-10 minutes of output will display on the screen as the steps run.
 4. The simulation will end.  Exit the container with `exit` and run `stop.sh` on your system to clean up the running container.
@@ -47,7 +47,7 @@ To Install:
 
 Try the following to play around with the system:
 
-* Open a terminal and run `run-with-shell.sh`.  This will let you log into the system before it has run `master_openworm.py`.  From here you can inspect the internals of the various checked out code bases and installed systems and modify things. Afterwards you'll still need to run `stop.sh` to clean up.
+* Open a terminal and run `run-shell-only.sh`.  This will let you log into the system before it has run `master_openworm.py`.  From here you can inspect the internals of the various checked out code bases and installed systems and modify things. Afterwards you'll still need to run `stop.sh` to clean up.
 * If you modify what gets installed, you should modify Dockerfile.  If you modify what runs, you should modify `master_openworm.py`.  Either way you will need to run `build.py` in order to rebuild the image locally.  Afterwards you can run normally.
 
 Documentation
