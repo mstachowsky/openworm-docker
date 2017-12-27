@@ -114,7 +114,7 @@ DEFAULTS = {'duration': 15.0, # 50 ms
             'reference': 'FW',
             'c302params': 'C2',
             'verbose': False,
-            'device': 'ALL',
+            'device': 'GPU',
             'configuration': 'worm_crawl_half_resolution',
             'noc302': False,
             'datareader': 'UpdatedSpreadsheetDataReader',

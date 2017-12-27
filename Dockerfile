@@ -151,4 +151,5 @@ ENV SIBERNETIC_HOME=$HOME/sibernetic
 ENV PYTHONPATH=$PYTHONPATH:$C302_HOME:$SIBERNETIC_HOME
 
 # Not working with --chown=$USER:$USER
-COPY --chown=ow:ow ./master_openworm.py $HOME/master_openworm.py
+COPY ./master_openworm.py $HOME/master_openworm.py
+RUN sudo chown $USER:$USER $HOME/master_openworm.py
