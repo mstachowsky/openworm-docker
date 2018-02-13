@@ -56,7 +56,7 @@ Try the following to play around with the system:
 
 **How do I access more data than what is already output?**
 
-The simulation by default outputs only a few figures and movies.  If you want to access the entire output of the simulation, you will need to copy it from the docker container.  
+The simulation by default outputs only a few figures and movies to your home system (that is, outside of the docker container).  If you want to access the entire output of the simulation, you will need to copy it from the docker container.  
 
 For example, say you want to extract the worm motion data.  This is contained in the file `worm_motion_log.txt`, which is found in the `/home/ow/sibernetic/simulations/[SPECIFIC_TIMESTAMPED_DIRECTORY]/worm_motion_log.txt`.  The directory `[SPECIFIC_TIMESTAMPED_DIRECTORY]` will have a name like `C2_FW_2018_02-12_18-36-32`, and its name can be found by checking the `output` directory.  This is actually the main output directory for the simulation, and contains all output, including cell modelling and worm movement.  
 
@@ -64,7 +64,11 @@ Once the simulation ends and you exit the container with `exit`, but before you 
 
 `docker cp openworm:/home/ow/sibernetic/simulations/[SPECIFIC_TIMESTAMPED_DIRECTORY]/worm_motion_log.txt ./worm_motion_log.txt`
 
-This will copy the file from the docker container.
+This will copy the file from the docker container.  **It is crucial that you do not run `stop.sh` before trying to get your data out (see below)**
+
+**What is the difference between `exit` and `stop.sh`?
+
+When you are in the Docker Container `openworm`, and are done interacting with it, you type `exit` to return to your system's shell.  This stops execution of anything in the container, and that container's status is now `Exited`.  If you try to re-start the process using `run-shell-only.sh`, you will get an error saying that the container already exists.  You can choose, at this point, to run `stop.sh`.  Doing so will remove the container and any files associated with it, allowing you to run a new simulation.  However, if you don't want to remove that container, you will instead want to re-enter it.
 
 **How do I enter a container I just exited?**
 
