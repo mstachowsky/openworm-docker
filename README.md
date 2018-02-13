@@ -54,7 +54,7 @@ Try the following to play around with the system:
 
 ### FAQ
 
-**How do I access more data than what is already output?**
+#### **How do I access more data than what is already output?**
 
 The simulation by default outputs only a few figures and movies to your home system (that is, outside of the docker container).  If you want to access the entire output of the simulation, you will need to copy it from the docker container.  
 
@@ -66,11 +66,11 @@ Once the simulation ends and you exit the container with `exit`, but before you 
 
 This will copy the file from the docker container.  **It is crucial that you do not run `stop.sh` before trying to get your data out (see below)**
 
-**What is the difference between `exit` and `stop.sh`?
+#### **What is the difference between `exit` and `stop.sh`?**
 
 When you are in the Docker Container `openworm`, and are done interacting with it, you type `exit` to return to your system's shell.  This stops execution of anything in the container, and that container's status is now `Exited`.  If you try to re-start the process using `run-shell-only.sh`, you will get an error saying that the container already exists.  You can choose, at this point, to run `stop.sh`.  Doing so will remove the container and any files associated with it, allowing you to run a new simulation.  However, if you don't want to remove that container, you will instead want to re-enter it.
 
-**How do I enter a container I just exited?**
+#### **How do I enter a container I just exited?**
 
 
 
